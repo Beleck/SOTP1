@@ -9,7 +9,7 @@ int main (int argc, char * argv[]){
 }
 
 /*
- *  Problem: Program ends but keeps running, its strange, try it and you'll understand
+ *  Problem: parent process ends and the remaining processes end up orphans.
  */
 void forker(char * files[]){
   int childPid[NUM_WORKERS];
