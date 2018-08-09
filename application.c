@@ -4,14 +4,14 @@
 #include "include/application.h"
 
 int main (int argc, char * argv[]){
-  forker2(argv);
+  forker(argv);
   return 0;
 }
 
 /*
  *  Problem: Program ends but keeps running, its strange, try it and you'll understand
  */
-void forker2(char * files[]){
+void forker(char * files[]){
   int childPid[NUM_WORKERS];
   for (int i =0; i<NUM_WORKERS; i++){
     char * args[] = {(char*)&i, NULL};
