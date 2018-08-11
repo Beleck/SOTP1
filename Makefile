@@ -1,6 +1,7 @@
 CC=gcc
 CFLAGS=-g -Wall
-DEPS=viewer.h slave.h application.h
+IDIR=include
+DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
 OBJ=viewer.o slave.o application.o
 
 %.o: %.c $(DEPS)
@@ -9,4 +10,4 @@ OBJ=viewer.o slave.o application.o
 %: %.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
-all: application
+all: application slave 
