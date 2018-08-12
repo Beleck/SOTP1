@@ -31,15 +31,15 @@ int main (int argc, char * argv[]){
         }
     }
 
-    num_files -= NUM_WORKERS * num_init;
 
-    //while (num_files > 0) {
-    //    sem_wait(sem);
-    //}
-
-    for (int i = 0; i < NUM_WORKERS; i++) {
-        waitpid(child_pid[i], 0, 0);
+    while (num_files > 0) {
+        sem_wait(sem);
+        num_files -= NUM_WORKERS * num_init;
     }
+
+//    for (int i = 0; i < NUM_WORKERS; i++) {
+//        waitpid(child_pid[i], 0, 0);
+//    }
     sem_close(sem);
     sem_unlink("/SEM");
     return 0;

@@ -11,17 +11,17 @@
 void md5_file(char *file); 
 
 int main(int argc, char * argv[]){
-    //sem_t *sem = sem_open("/SEM", O_RDWR);
+    sem_t *sem = sem_open("/SEM", O_RDWR);
 
     for (int i = 1; i < argc; i++) {
         printf("File : %s\n", argv[i]);
         md5_file(argv[i]);
     }
 
-    //if (sem_post(sem) == -1) {
-    //    fprintf(stderr, "Error on sem\n");
-    //}
-    //sem_close(sem);
+    if (sem_post(sem) == -1) {
+        fprintf(stderr, "Error on sem\n");
+    }
+    sem_close(sem);
     return 0;
 }
 
