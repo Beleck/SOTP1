@@ -32,7 +32,6 @@ void *newshmmap(size_t length, int prot, int flags, int fd, off_t offset){
 	return map;
 }
 
-//wrapper
 sem_t *newsem(const char *name, int oflag, mode_t mode, unsigned int value){
 	sem_t *sem;
 	if( (sem = sem_open(name, oflag, mode, value)) == SEM_FAILED){

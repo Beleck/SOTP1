@@ -1,4 +1,5 @@
 #define _POSIX_SOURCE
+#define BASE_LEN 10
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -45,14 +46,32 @@ int appPid = 0;
 	sem_t *appSem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
 
 	//reads from the semaphore until signalled by the application process with kill
+	int startOfNextHash = 0;
 	while(1){
 		if(sem_wait(appSem)){
 			printf("error waiting for semaphore\n");
 			printf("%s\n", strerror(errno));
 			break;
 		}
+		char *filehash = NULL;
+		//a dash will be used to signal the end of one hash and the start of the next.
+		for(int i = startOfNextHash; *(hashes + i) != '-'; i++){
+			if((i - startOfNextHash) %BASE_LEN == 0){
+				filehash = realloc(filehash, BASE_LEN*(i+1));
+			}
+			filehash[i - startOfNextHash] = appShm[i]
+		}
+		startOfNextHash += i + 1;
+		if( (i - startOfNextHash)% BASE_LEN == 0){
+			filehash = realloc(filehash, BASE_LEN*i + 1);
+		}
+		printf("%s\n", filehash);
 	}
 
+	//if everything goes correctly these should never be reached. The application
+	//process will kill the view process using kill() upon having finished calculating the hashes
+	//and do the shared memory and semaphore cleanups itself. However, were there to be an error with
+	//sem_wait it would be necessary to close these resources.
 	shm_unlink(APP_SHM);
 	sem_close(appSem);
 
