@@ -21,21 +21,25 @@ int main (int argc, char * argv[]){
     for (int i = 0; i < NUM_WORKERS; i++) {
         child_pid[i] = fork();
         if (!child_pid[i]){
-            char *temp[num_init + 1];
+            char *temp[num_init + 2];
             temp[0] = "slave";
             for (int j = 1; j < num_init + 1; j++) {
                 temp[j] = argv[i*num_init + j];
             }
+            temp[num_init + 1] = NULL;
             execv(SLAVE_DIR, temp);
         }
     }
 
-    num_files -= NUM_WORKERS * num_init;
 
-    //while (num_files > 0) {
-    //    sem_wait(sem);
-    //}
+    while (num_files > 0) {
+        sem_wait(sem);
+        num_files -= NUM_WORKERS * num_init;
+    }
 
+//    for (int i = 0; i < NUM_WORKERS; i++) {
+//        waitpid(child_pid[i], 0, 0);
+//    }
     sem_close(sem);
     sem_unlink("/SEM");
     return 0;
