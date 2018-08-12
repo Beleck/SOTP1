@@ -14,6 +14,7 @@ int main(int argc, char * argv[]){
     //sem_t *sem = sem_open("/SEM", O_RDWR);
 
     for (int i = 1; i < argc; i++) {
+        printf("File : %s\n", argv[i]);
         md5_file(argv[i]);
     }
 
