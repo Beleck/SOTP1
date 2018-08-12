@@ -5,7 +5,7 @@ IDIR=include
 DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
 OBJ=viewer.o slave.o application.o
 
-%.o: %.c $(DEPS) 
+%.o: %.c  
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 %: %.o
