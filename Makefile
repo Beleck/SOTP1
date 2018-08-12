@@ -11,4 +11,4 @@ OBJ=viewer.o slave.o application.o
 %: %.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-all: application slave viewer
+all: application slave
