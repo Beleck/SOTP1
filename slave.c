@@ -5,17 +5,27 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include "include/application.h"
-#include "include/slave.h"
+#include <semaphore.h>
+#include <errno.h>
+
+void md5_file(char *file); 
 
 int main(int argc, char * argv[]){
-    md5_file("test");
+    //sem_t *sem = sem_open("/SEM", O_RDWR);
+
+    for (int i = 1; i < argc; i++) {
+        md5_file(argv[i]);
+    }
+
+    //if (sem_post(sem) == -1) {
+    //    fprintf(stderr, "Error on sem\n");
+    //}
+    //sem_close(sem);
     return 0;
 }
 
 void md5_file(char *file) {
     int pid = fork();
-
     if (pid) {
         waitpid(pid, NULL, 0);
     } else {
