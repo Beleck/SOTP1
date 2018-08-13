@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -15,8 +16,8 @@ int main(int argc, char * argv[]){
     int num_char = getline(&line, &size, stdin);
     while (num_char != -1) {
         line[num_char - 1] = '\0';
-        printf("%s\n", line);
         md5_file(line);
+        kill(getppid(), SIGUSR1);
         num_char = getline(&line, &size, stdin);
     }
     return 0;
