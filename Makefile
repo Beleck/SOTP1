@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall -Wextra -std=c99
+CFLAGS=-g -Wall -Wextra 
 LDFLAGS=-pthread
 IDIR=include
 DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
