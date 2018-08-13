@@ -15,6 +15,11 @@ void sig_handle() {
 }
 
 int main (int argc, char * argv[]){
+    if (argc == 1) {
+        fprintf(stderr, "Need almost one file\n");
+        exit(EXIT_FAILURE);
+    }
+
 // Signal initialisation
     signal(SIGUSR1, sig_handle);
 
