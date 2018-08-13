@@ -5,10 +5,9 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <semaphore.h>
 #include <errno.h>
-
-void md5_file(char *file); 
+#include <string.h>
+#include "include/slave.h"
 
 int main(int argc, char * argv[]){
     size_t size;
@@ -16,6 +15,7 @@ int main(int argc, char * argv[]){
     int num_char = getline(&line, &size, stdin);
     while (num_char != -1) {
         line[num_char - 1] = '\0';
+        printf("%s\n", line);
         md5_file(line);
         num_char = getline(&line, &size, stdin);
     }
@@ -27,6 +27,6 @@ void md5_file(char *file) {
     if (pid) {
         waitpid(pid, NULL, 0);
     } else {
-        execl("/usr/bin/md5sum", "md5sum", file, NULL);
+         execl("/usr/bin/md5sum", "md5sum", file, NULL);
     }
 }
