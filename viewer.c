@@ -1,4 +1,4 @@
-#define _POSIX_SOURCE
+#define _POSIX_C_SOURCE 200809L
 #define BASE_LEN 10
 #include <unistd.h>
 #include <signal.h>
@@ -14,8 +14,8 @@ int main(int argc, char** argv){
 
 int appPid = 0;
 
-	if(argc == 1){
-		sscanf(argv[0], "%d", &appPid);
+	if(argc == 2){
+		sscanf(argv[1], "%d", &appPid);
 		//the process with pid 1 is init so any id less or equal to that will be invalid.
 		//If the appPid is greater than this processes pid it means the application process
 		//hasn't been run yet so there will be nobody to signal
@@ -54,18 +54,23 @@ int appPid = 0;
 			break;
 		}
 		char *filehash = NULL;
+		int i = startOfNextHash;
 		//a dash will be used to signal the end of one hash and the start of the next.
-		for(int i = startOfNextHash; *(hashes + i) != '-'; i++){
+		for(; *(hashes + i) != '-'; i++){
 			if((i - startOfNextHash) %BASE_LEN == 0){
 				filehash = realloc(filehash, BASE_LEN*(i+1));
 			}
-			filehash[i - startOfNextHash] = appShm[i]
+			filehash[i - startOfNextHash] = hashes[i];
 		}
-		startOfNextHash += i + 1;
+		startOfNextHash += (i - startOfNextHash) + 1;
 		if( (i - startOfNextHash)% BASE_LEN == 0){
 			filehash = realloc(filehash, BASE_LEN*i + 1);
 		}
+		filehash[i-startOfNextHash] = 0;
 		printf("%s\n", filehash);
+		printf("%d\n", startOfNextHash);
+		if(hashes[startOfNextHash] == 0)
+			break;
 	}
 
 	//if everything goes correctly these should never be reached. The application
@@ -74,6 +79,7 @@ int appPid = 0;
 	//sem_wait it would be necessary to close these resources.
 	shm_unlink(APP_SHM);
 	sem_close(appSem);
+	sem_unlink(APP_SEM);
 
 	return 0;
 }
