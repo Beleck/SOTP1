@@ -6,13 +6,29 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <semaphore.h>
+#include "appShm.c"
 
 #define SLAVE_DIR "./slave"
 #define NUM_WORKERS 2
+#define BASE_SIZE 1000
+
+static int viewerSignalReceived = 0;
+static int viewerShmFd;
+static char *viewmmap = NULL;
+static sem_t *viewSem;
 
 void sig_handle() {
 //    printf("Signal Received\n");
     return;
+}
+
+void sig_handle_viewer(){
+    viewerSignalReceived = 1;
+
+    viewerShmFd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
+    posix_fallocate(viewerShmFd, 0, BASE_SIZE);
+    viewmmap = newshmmap(BASE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
+    viewSem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
 }
 
 int main (int argc, char * argv[]){
@@ -23,6 +39,7 @@ int main (int argc, char * argv[]){
 
 // Signal initialisation
     signal(SIGUSR1, sig_handle);
+    signal(SIGUSR2, sig_handle_viewer);
 
 // Pipe initialisation
     int fd[2];
