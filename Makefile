@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall -Wextra 
-LDFLAGS=-pthread
+LDFLAGS=-pthread -ltr
 IDIR=include
 DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
 OBJ=viewer.o slave.o application.o

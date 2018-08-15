@@ -49,28 +49,35 @@ int appPid = 0;
 	int startOfNextHash = 0;
 	while(1){
 		if(sem_wait(appSem)){
-			printf("error waiting for semaphore\n");
+			printf("error waiting for semaphore, terminating\n");
 			printf("%s\n", strerror(errno));
 			break;
 		}
 		char *filehash = NULL;
+		int allocatedMemory = 0;
 		int i = startOfNextHash;
 		//a dash will be used to signal the end of one hash and the start of the next.
 		for(; *(hashes + i) != '-'; i++){
-			if((i - startOfNextHash) %BASE_LEN == 0){
-				filehash = realloc(filehash, BASE_LEN*(i+1));
+			if((i - startOfNextHash) % BASE_LEN == 0){
+				if( (filehash = realloc(filehash, allocatedMemory + BASE_LEN)) == NULL){
+					printf("error allocating memory, terminating\n");
+					return -1;
+				}
+				allocatedMemory += BASE_LEN;
 			}
 			filehash[i - startOfNextHash] = hashes[i];
 		}
 		startOfNextHash += (i - startOfNextHash) + 1;
-		if( (i - startOfNextHash)% BASE_LEN == 0){
-			filehash = realloc(filehash, BASE_LEN*i + 1);
+		if( (i - startOfNextHash) % BASE_LEN == 0){
+			filehash = realloc(filehash, BASE_LEN*sizeof(filehash) + 1);
 		}
 		filehash[i-startOfNextHash] = 0;
 		printf("%s\n", filehash);
-		printf("%d\n", startOfNextHash);
-		if(hashes[startOfNextHash] == 0)
+
+		//a cero will be used to signal the end of the list of hashes.
+		if(hashes[startOfNextHash] == 0){
 			break;
+		}
 	}
 
 	//if everything goes correctly these should never be reached. The application
