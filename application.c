@@ -7,7 +7,7 @@
 #include <semaphore.h>
 
 #define SLAVE_DIR "./slave"
-#define NUM_WORKERS 2 
+#define NUM_WORKERS 2
 
 void sig_handle() {
 //    printf("Signal Received\n");
@@ -16,7 +16,7 @@ void sig_handle() {
 
 int main (int argc, char * argv[]){
     if (argc == 1) {
-        fprintf(stderr, "Need almost one file\n");
+        fprintf(stderr, "Need at least one file\n");
         exit(EXIT_FAILURE);
     }
 
@@ -28,7 +28,7 @@ int main (int argc, char * argv[]){
     pipe(fd);
 
 // Variable initialisation
-    int num_files = argc - 1; 
+    int num_files = argc - 1;
     int child_pid[NUM_WORKERS];
     int num_init = num_files/(NUM_WORKERS*4) + 1;
 
@@ -47,7 +47,7 @@ int main (int argc, char * argv[]){
             }
         }
     }
-    
+
     while (num_files > 0) {
         pause();
         dprintf(fd[1], "%s\n", argv[argc - num_files]);
@@ -63,4 +63,3 @@ int main (int argc, char * argv[]){
 
     return 0;
 }
-
