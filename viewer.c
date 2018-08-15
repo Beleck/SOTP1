@@ -34,7 +34,7 @@ int appPid = 0;
 	//signal the application process that the view has begun.
 	//Using SIGCHLD since the default is to ignore that signal, if not handled properly
 	//it at least won't kill the application process.
-	if(kill(appPid, SIGCHLD) == -1){
+	if(kill(appPid, SIGUSR2) == -1){
 		printf("error signalling the application process, terminating\n");
 		printf("%s\n", strerror(errno));
 		return -1;
@@ -54,12 +54,12 @@ int appPid = 0;
 			break;
 		}
 		char *filehash = NULL;
-		int allocatedMemory = 0;
+		int timesAllocatedMemory = 0;
 		int i = startOfNextHash;
 		//a dash will be used to signal the end of one hash and the start of the next.
 		for(; *(hashes + i) != '-'; i++){
 			if((i - startOfNextHash) % BASE_LEN == 0){
-				if( (filehash = realloc(filehash, allocatedMemory + BASE_LEN)) == NULL){
+				if( (filehash = realloc(filehash, timesAllocatedMemory*(BASE_LEN+1))) == NULL){
 					printf("error allocating memory, terminating\n");
 					return -1;
 				}
@@ -69,7 +69,7 @@ int appPid = 0;
 		}
 		startOfNextHash += (i - startOfNextHash) + 1;
 		if( (i - startOfNextHash) % BASE_LEN == 0){
-			filehash = realloc(filehash, BASE_LEN*sizeof(filehash) + 1);
+			filehash = realloc(filehash, timesAllocatedMemory*BASE_LEN + 1);
 		}
 		filehash[i-startOfNextHash] = 0;
 		printf("%s\n", filehash);
