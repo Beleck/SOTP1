@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-g -Wall -Wextra 
-LDFLAGS=-pthread -ltr
+CFLAGS=-g -Wall -Wextra -std=c99
+LDFLAGS=-pthread -lrt
 IDIR=include
 DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
 OBJ=viewer.o slave.o application.o
 
-%.o: %.c  
+%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 %: %.o
