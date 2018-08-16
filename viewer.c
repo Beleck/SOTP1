@@ -63,7 +63,7 @@ int appPid = 0;
 					printf("error allocating memory, terminating\n");
 					return -1;
 				}
-				allocatedMemory += BASE_LEN;
+				timesAllocatedMemory++;
 			}
 			filehash[i - startOfNextHash] = hashes[i];
 		}
