@@ -12,3 +12,8 @@ OBJ=viewer.o slave.o application.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 all: application slave
+
+.PHONY = clean
+
+clean:
+	rm -f application.o slave.o application slave
