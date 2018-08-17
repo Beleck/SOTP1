@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <semaphore.h>
-#include "appShm.c"
+//#include "appShm.c"
 
 #define SLAVE_DIR "./slave"
 #define NUM_WORKERS 2
