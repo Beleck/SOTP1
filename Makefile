@@ -16,4 +16,4 @@ all: application slave
 .PHONY = clean
 
 clean:
-	rm -f application.o slave.o application slave
+	rm -f application.o slave.o application slave viewer
