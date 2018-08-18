@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <string.h>
+#include "AllTests.c"
 #include "appShm.c"
 #include "CuTest.h"
 
