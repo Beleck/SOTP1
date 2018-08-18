@@ -7,9 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <semaphore.h>
-#define APP_SHM "/appShm"
-#define APP_SEM "/appSem"
-#define DFLT_SIZE 1000
 
 int newshm(char *name, int oflags, int mode){
 	int fd;
