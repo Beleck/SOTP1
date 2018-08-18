@@ -27,7 +27,7 @@ void sig_handle_viewer(){
 
     viewerShmFd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
     posix_fallocate(viewerShmFd, 0, BASE_SIZE);
-    viewmmap = newshmmap(BASE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
+    viewmmap = newshmmap(BASE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, viewerShmFd, 0);
     viewSem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
 }
 

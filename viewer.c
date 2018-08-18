@@ -8,28 +8,21 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include "appShm.c"
+#include <Include/appShm.h>
+
+int getAppPid(int argc, char** argv);
+
+//reads from the semaphore until it reads a cero from the shared memory
+void printHashes(char *hashes, sem_t *appSem);
+
+//reads a hash from the shm and returns the ammount of characters read.
+int readHash(char *hashes, int startOfNextHash);
+
+void printHash(int length, char *filehash, int timesAllocatedMemory);
 
 int main(int argc, char** argv){
 
-int appPid = 0;
-
-	if(argc == 2){
-		sscanf(argv[1], "%d", &appPid);
-		//the process with pid 1 is init so any id less or equal to that will be invalid.
-		//If the appPid is greater than this processes pid it means the application process
-		//hasn't been run yet so there will be nobody to signal
-		if(appPid <= 1 || appPid >= (int) getpid()){
-			printf("invalid process id, process ending\n");
-			return -1;
-		}
-	}
-	else {
-		do{
-			scanf("%d", &appPid);
-		}
-		while(appPid <= 1 || appPid >= (int) getpid());
-	}
+int appPid = getAppPid(argc, argv);
 
 	//signal the application process that the view has begun.
 	//Using SIGCHLD since the default is to ignore that signal, if not handled properly
@@ -45,7 +38,40 @@ int appPid = 0;
 	char *hashes = newshmmap(DFLT_SIZE, PROT_READ, MAP_SHARED, appShmFd, 0);
 	sem_t *appSem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
 
-	//reads from the semaphore until signalled by the application process with kill
+	printHashes(hashes, appSem);
+
+	shm_unlink(APP_SHM);
+	sem_close(appSem);
+	sem_unlink(APP_SEM);
+
+	return 0;
+}
+
+int getAppPid(int argc, char** argv){
+
+	int appPid;
+
+	if(argc == 2){
+		sscanf(argv[1], "%d", &appPid);
+		//the process with pid 1 is init so any id less or equal to that will be invalid.
+		//If the appPid is greater than this processes pid it means the application process
+		//hasn't been run yet so there will be nobody to signal
+		if(appPid <= 1 || appPid >= (int) getpid()){
+			printf("invalid process id, process ending\n");
+			exit(1);
+		}
+	}
+	else {
+		do{
+			scanf("%d", &appPid);
+		}
+		while(appPid <= 1 || appPid >= (int) getpid());
+	}
+	return appPid;
+}
+
+void printHashes(char *hashes, sem_t *appSem){
+
 	int startOfNextHash = 0;
 	while(1){
 		if(sem_wait(appSem)){
@@ -53,40 +79,42 @@ int appPid = 0;
 			printf("%s\n", strerror(errno));
 			break;
 		}
-		char *filehash = NULL;
-		int timesAllocatedMemory = 0;
-		int i = startOfNextHash;
-		//a dash will be used to signal the end of one hash and the start of the next.
-		for(; *(hashes + i) != '-'; i++){
-			if((i - startOfNextHash) % BASE_LEN == 0){
-				if( (filehash = realloc(filehash, timesAllocatedMemory*(BASE_LEN+1))) == NULL){
-					printf("error allocating memory, terminating\n");
-					return -1;
-				}
-				timesAllocatedMemory++;
-			}
-			filehash[i - startOfNextHash] = hashes[i];
-		}
-		startOfNextHash += (i - startOfNextHash) + 1;
-		if( (i - startOfNextHash) % BASE_LEN == 0){
-			filehash = realloc(filehash, timesAllocatedMemory*BASE_LEN + 1);
-		}
-		filehash[i-startOfNextHash] = 0;
-		printf("%s\n", filehash);
-
+		startOfNextHash += readHash(hashes, startOfNextHash) + 1;
 		//a cero will be used to signal the end of the list of hashes.
 		if(hashes[startOfNextHash] == 0){
 			break;
 		}
 	}
+}
 
-	//if everything goes correctly these should never be reached. The application
-	//process will kill the view process using kill() upon having finished calculating the hashes
-	//and do the shared memory and semaphore cleanups itself. However, were there to be an error with
-	//sem_wait it would be necessary to close these resources.
-	shm_unlink(APP_SHM);
-	sem_close(appSem);
-	sem_unlink(APP_SEM);
+int readHash(char *hashes, int startOfNextHash){
 
-	return 0;
+	char *filehash = NULL;
+	int timesAllocatedMemory = 0;
+	int i = startOfNextHash;
+	//a dash will be used to signal the end of one hash and the start of the next.
+	for(; *(hashes + i) != '-'; i++){
+		if((i - startOfNextHash) % BASE_LEN == 0){
+			if( (filehash = realloc(filehash, timesAllocatedMemory*(BASE_LEN+1))) == NULL){
+				printf("error allocating memory, terminating\n");
+				exit(1);
+			}
+			timesAllocatedMemory++;
+		}
+		filehash[i - startOfNextHash] = hashes[i];
+	}
+	printHash(i - startOfNextHash, filehash, timesAllocatedMemory);
+	return i - startOfNextHash;
+}
+
+void printHash(int length, char *filehash, int timesAllocatedMemory){
+
+	if( length % BASE_LEN == 0){
+		if ((filehash = realloc(filehash, timesAllocatedMemory*BASE_LEN + 1)) == NULL){
+			printf("error allocating memory, terminating\n");
+				exit(1);
+		}
+	}
+	filehash[length] = 0;
+	printf("%s\n", filehash);
 }
