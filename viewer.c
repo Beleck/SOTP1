@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "appShm.c"
+#include "CuTest.h"
 
 int getAppPid(int argc, char** argv);
 
@@ -20,9 +21,13 @@ int readHash(char *hashes, int startOfNextHash);
 
 void printHash(int length, char *filehash, int timesAllocatedMemory);
 
+
+
+
+
 int main(int argc, char** argv){
 
-int appPid = getAppPid(argc, argv);
+	int appPid = getAppPid(argc, argv);
 
 	//signal the application process that the view has begun.
 	//Using SIGCHLD since the default is to ignore that signal, if not handled properly
@@ -30,7 +35,7 @@ int appPid = getAppPid(argc, argv);
 	if(kill(appPid, SIGUSR2) == -1){
 		printf("error signalling the application process, terminating\n");
 		printf("%s\n", strerror(errno));
-		return -1;
+		exit(1);
 	}
 
 	int appShmFd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
@@ -46,6 +51,11 @@ int appPid = getAppPid(argc, argv);
 
 	return 0;
 }
+
+
+
+
+
 
 int getAppPid(int argc, char** argv){
 
@@ -90,21 +100,19 @@ void printHashes(char *hashes, sem_t *appSem){
 int readHash(char *hashes, int startOfNextHash){
 
 	char *filehash = NULL;
-	int timesAllocatedMemory = 0;
-	int i = startOfNextHash;
+	int lengthOfCurrentHash = 0;
 	//a dash will be used to signal the end of one hash and the start of the next.
-	for(; *(hashes + i) != '-'; i++){
-		if((i - startOfNextHash) % BASE_LEN == 0){
-			if( (filehash = realloc(filehash, timesAllocatedMemory*(BASE_LEN+1))) == NULL){
+	for(int i = startOfNextHash; *(hashes + i) != '-'; i++, lengthOfCurrentHash++){
+		if(lengthOfCurrentHash % BASE_LEN == 0){
+			if( (filehash = realloc(filehash, lengthOfCurrentHash + BASE_LEN)) == NULL){
 				printf("error allocating memory, terminating\n");
 				exit(1);
 			}
-			timesAllocatedMemory++;
 		}
-		filehash[i - startOfNextHash] = hashes[i];
+		filehash[lengthOfCurrentHash] = hashes[i];
 	}
-	printHash(i - startOfNextHash, filehash, timesAllocatedMemory);
-	return i - startOfNextHash;
+	printHash(lengthOfCurrentHash, filehash, timesAllocatedMemory);
+	return lengthOfCurrentHash;
 }
 
 void printHash(int length, char *filehash, int timesAllocatedMemory){
