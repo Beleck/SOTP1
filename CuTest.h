@@ -113,4 +113,6 @@ void CuSuiteRun(CuSuite* testSuite);
 void CuSuiteSummary(CuSuite* testSuite, CuString* summary);
 void CuSuiteDetails(CuSuite* testSuite, CuString* details);
 
+void RunAllTests(void);
+
 #endif /* CU_TEST_H */

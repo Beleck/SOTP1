@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <string.h>
 #include "appShm.c"
 #include "CuTest.h"
 
@@ -19,7 +20,9 @@ void printHashes(char *hashes, sem_t *appSem);
 //reads a hash from the shm and returns the ammount of characters read.
 int readHash(char *hashes, int startOfNextHash);
 
-void printHash(int length, char *filehash, int timesAllocatedMemory);
+void printHash(int length, char *filehash);
+
+void checkForTests(int argc, char **argv);
 
 
 
@@ -27,6 +30,7 @@ void printHash(int length, char *filehash, int timesAllocatedMemory);
 
 int main(int argc, char** argv){
 
+	checkForTests(argc, argv);
 	int appPid = getAppPid(argc, argv);
 
 	//signal the application process that the view has begun.
@@ -102,7 +106,7 @@ int readHash(char *hashes, int startOfNextHash){
 	char *filehash = NULL;
 	int lengthOfCurrentHash = 0;
 	//a dash will be used to signal the end of one hash and the start of the next.
-	for(int i = startOfNextHash; *(hashes + i) != '-'; i++, lengthOfCurrentHash++){
+	for(int i = startOfNextHash; hashes[i] != '-' && hashes[i] != '\0'; i++, lengthOfCurrentHash++){
 		if(lengthOfCurrentHash % BASE_LEN == 0){
 			if( (filehash = realloc(filehash, lengthOfCurrentHash + BASE_LEN)) == NULL){
 				printf("error allocating memory, terminating\n");
@@ -111,18 +115,62 @@ int readHash(char *hashes, int startOfNextHash){
 		}
 		filehash[lengthOfCurrentHash] = hashes[i];
 	}
-	printHash(lengthOfCurrentHash, filehash, timesAllocatedMemory);
+	printHash(lengthOfCurrentHash, filehash);
 	return lengthOfCurrentHash;
 }
 
-void printHash(int length, char *filehash, int timesAllocatedMemory){
+void printHash(int length, char *filehash){
 
 	if( length % BASE_LEN == 0){
-		if ((filehash = realloc(filehash, timesAllocatedMemory*BASE_LEN + 1)) == NULL){
+		if ((filehash = realloc(filehash, length + 1)) == NULL){
 			printf("error allocating memory, terminating\n");
 				exit(1);
 		}
 	}
 	filehash[length] = 0;
 	printf("%s\n", filehash);
+}
+
+
+
+
+
+void checkForTests(int argc, char** argv){
+	printf("%s\n", argv[1]);
+	if(argc == 2 && strcmp(argv[1], "--test") == 0){
+		RunAllTests();
+		exit(0);
+	}
+}
+
+void TestReadHash_normalHash(CuTest *tc){
+	printf("TestReadHash_normalHash, input: \"normalHash-\"\noutput: ");
+	char *input = "normalHash-";
+	int expected = strlen(input) - 1;
+	int actual = readHash(input, 0);
+	CuAssertIntEquals(tc, expected, actual);
+}
+
+void TestReadHash_emptyHash(CuTest *tc){
+	printf("TestReadHash_emptyHash, input: \"\"\noutput: ");
+	char *input = "";
+	int expected = strlen(input);
+	int actual = readHash(input, 0);
+	CuAssertIntEquals(tc, expected, actual);
+}
+
+void TestReadHash_hashWithDash(CuTest *tc){
+	printf("TestReadHash_hashWithDash, input: \"normal-hash\"\noutput: ");
+	char *input = "normal-hash";
+	int expected = strlen("normal");
+	int actual = readHash(input, 0);
+	CuAssertIntEquals(tc, expected, actual);
+}
+
+CuSuite* viewerGetSuite(){
+	CuSuite *suite = CuSuiteNew();
+	SUITE_ADD_TEST(suite, TestReadHash_normalHash);
+	SUITE_ADD_TEST(suite, TestReadHash_emptyHash);
+	SUITE_ADD_TEST(suite, TestReadHash_hashWithDash);
+	return suite;
 }
