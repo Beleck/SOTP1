@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <Include/appShm.h>
+#include "appShm.c"
 
 int getAppPid(int argc, char** argv);
 
