@@ -2,18 +2,21 @@ CC=gcc
 CFLAGS=-g -Wall -Wextra -std=c99
 LDFLAGS=-pthread -lrt
 IDIR=include
-DEPS=$(IDIR)/viewer.h $(IDIR)/slave.h $(IDIR)/application.h
-OBJ=viewer.o slave.o application.o
+DEPS=$(wildcard $(IDIR)/*.h)
+OBJ=app_shm.o
+TARGET=application slave viewer
 
-%.o: %.c
+all: $(TARGET)
+
+application: application.o $(OBJ)
+viewer: viewer.o $(OBJ)
+slave: slave.o $(OBJ)
+	$(CC) -o $@ $(LDFLAGS) $^
+
+%.o: %.c $(DEPS) 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-%: %.o
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-all: application slave viewer
-
 .PHONY = clean
-
 clean:
-	rm -f application.o slave.o application slave viewer
+	rm -f $(TARGET) 
+

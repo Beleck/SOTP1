@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <string.h>
-#include "appShm.c"
+#include "include/app_shm.h"
 #include "CuTest.h"
 
 int get_app_pid(int argc, char** argv);

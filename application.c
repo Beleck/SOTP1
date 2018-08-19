@@ -8,8 +8,10 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 #include <semaphore.h>
-#include "appShm.c"
+#include "include/app_shm.h"
 #include "include/application.h"
 
 static int viewer_signal_received = 0;
