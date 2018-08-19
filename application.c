@@ -46,8 +46,6 @@ int main (int argc, char * argv[]){
 
 	//Current number of files to send to slave
     int num_files = argc - 1;
-	//keeps the total saved
-	int total = num_files;
     // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
@@ -56,7 +54,7 @@ int main (int argc, char * argv[]){
 // Childs creation and sending them first files
     for ( int i = 0; i < NUM_WORKERS; i++ ) {
         child_pid[i] = fork();
-        if ( child_pid[i] == 0) { //child process
+        if (!child_pid[i]) { //child process
             close(master_slave[1]);
             close(slave_master[0]);
     
@@ -89,11 +87,10 @@ int main (int argc, char * argv[]){
 	char *line = NULL;
 	size_t size;
 	int num_char;
-	int printed_files = 0;
     int index_shm = 0;
 	reader = fdopen(slave_master[0], "r");
-	num_char = getline(&line, &size, reader);
-	while(num_char != -1){
+    for (int nb_files = 0; nb_files < argc - 1; nb_files ++) {
+	    num_char = getline(&line, &size, reader);
         for (int i = 0; i < num_char - 1; i++) {
             buffer[index_shm] = line[i];
             index_shm++;            
@@ -101,21 +98,16 @@ int main (int argc, char * argv[]){
         buffer[index_shm] = '-';
         index_shm++;
         sem_post(view_sem);
-		printed_files += 1;
-		if (printed_files != total) {
-			num_char = getline(&line, &size, reader);
-		} else {
-			//Nothing left to print
-            buffer[index_shm] = 43;
-			num_char = -1;
-			close(master_slave[1]);
-		}
-
-	}
+    }
+    // End of the buffer
+    buffer[index_shm] = 43;
 
 	// Ending of the entire program
     close(master_slave[0]);
+    close(master_slave[1]);
+    close(slave_master[0]);
     close(slave_master[1]);
+
     for (int i = 0; i < NUM_WORKERS; i++) {
         waitpid(child_pid[i], NULL, 0);
     }
