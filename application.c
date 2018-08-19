@@ -18,16 +18,12 @@ static int viewer_signal_received = 0;
 static int viewer_shm_fd;
 static char *view_mmap = NULL;
 static sem_t *view_sem;
-static int sigReceived;
-
-// void sig_handle() {
-//     return;
-// }
+static int sig_received;
 
 void sig_viewer_handler(int signum){
     (void) signum;
 
-	sigReceived = 1;
+	sig_received = 1;
 }
 
 void sig_handle_viewer(){
@@ -60,7 +56,13 @@ int main (int argc, char * argv[]){
 	viewer_action.sa_flags = SA_RESTART;
 	sigaction(SIGUSR2, &viewer_action, NULL);
 
-    pause();
+    sleep(5);
+    char *buffer;
+    if (viewer_signal_received) {
+        buffer = view_mmap;        
+    } else {
+        buffer = malloc(sizeof(char) * BASE_SIZE);
+    }
 
 // Pipe initialisation
     int master_slave[2];
@@ -111,27 +113,27 @@ int main (int argc, char * argv[]){
 
 
 	FILE *reader;
-	char *buffer = NULL;
+	char *line = NULL;
 	size_t size;
 	int num_char;
 	int printed_files = 0;
     int index_shm = 0;
 	reader = fdopen(slave_master[0], "r");
-	num_char = getline(&buffer, &size, reader);
+	num_char = getline(&line, &size, reader);
 	while(num_char != -1){
         for (int i = 0; i < num_char - 1; i++) {
-            view_mmap[index_shm] = buffer[i];
+            buffer[index_shm] = line[i];
             index_shm++;            
         }
-        view_mmap[index_shm] = '-';
+        buffer[index_shm] = '-';
         index_shm++;
         sem_post(view_sem);
 		printed_files += 1;
 		if (printed_files != total) {
-			num_char = getline(&buffer, &size, reader);
+			num_char = getline(&line, &size, reader);
 		} else {
 			//Nothing left to print
-            view_mmap[index_shm] = 43;
+            buffer[index_shm] = 43;
 			num_char = -1;
 			close(master_slave[1]);
 		}

@@ -7,11 +7,12 @@ OBJ=app_shm.o
 TARGET=application slave viewer
 
 all: $(TARGET)
+	rm *.o
 
 application: application.o $(OBJ)
 viewer: viewer.o $(OBJ)
 slave: slave.o $(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $^
+	$(CC) -o $@ $(LDFLAGS) $^ 
 
 %.o: %.c $(DEPS) 
 	$(CC) -c -o $@ $< $(CFLAGS)
