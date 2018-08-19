@@ -6,13 +6,13 @@
 int viewer_signal_received = 0;
 char *view_mmap = NULL;
 
-void sig_viewer_handler(int signum){
+void sig_viewer_handler(int signum) {
     (void) signum;
 
 	sig_received = 1;
 }
 
-void sig_handle_viewer(){
+void sig_handle_viewer() {
     viewer_signal_received = 1;
 
     viewer_shm_fd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);

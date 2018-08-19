@@ -43,7 +43,6 @@ int main (int argc, char * argv[]){
     pipe(slave_master);
 
 // Variable initialisation
-
 	//Current number of files to send to slave
     int num_files = argc - 1;
     // Array of slave pid
@@ -52,9 +51,9 @@ int main (int argc, char * argv[]){
     int num_init = num_files/(NUM_WORKERS*4) + 1;
 
 // Childs creation and sending them first files
-    for ( int i = 0; i < NUM_WORKERS; i++ ) {
+    for (int i = 0; i < NUM_WORKERS; i++) {
         child_pid[i] = fork();
-        if (!child_pid[i]) { //child process
+        if (!child_pid[i]) { // Child process
             close(master_slave[1]);
             close(slave_master[0]);
     
@@ -65,31 +64,32 @@ int main (int argc, char * argv[]){
             close(slave_master[1]);
     
             execl(SLAVE_DIR, "slave", NULL);
-        } else if ( child_pid[i]>0 ){ //parent process
+        } else if (child_pid[i] > 0){ // Parent process
             for (int j = 0; j < num_init; j++) {
                 dprintf(master_slave[1], "%s\n", argv[i*num_init + j + 1]);
                 num_files--;
             }
-        } else { //error
+        } else { // Error
             fprintf(stderr,"Error creating child: %s\n",strerror(errno));
             exit(-1);
         }
     }
 
+// Sending files to slaves
 	while (num_files > 0) {
 	    pause();
 	    dprintf(master_slave[1], "%s\n", argv[argc - num_files]);
 	    num_files--;
 	}
 
-
+// Get md5 from slaves and fill buffer
 	FILE *reader;
 	char *line = NULL;
 	size_t size;
 	int num_char;
     int index_shm = 0;
 	reader = fdopen(slave_master[0], "r");
-    for (int nb_files = 0; nb_files < argc - 1; nb_files ++) {
+    for (int nb_files = 0; nb_files < argc - 1; nb_files++) {
 	    num_char = getline(&line, &size, reader);
         for (int i = 0; i < num_char - 1; i++) {
             buffer[index_shm] = line[i];
@@ -102,7 +102,7 @@ int main (int argc, char * argv[]){
     // End of the buffer
     buffer[index_shm] = 43;
 
-	// Ending of the entire program
+// Ending of the entire program
     close(master_slave[0]);
     close(master_slave[1]);
     close(slave_master[0]);

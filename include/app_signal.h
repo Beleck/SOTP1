@@ -1,3 +1,5 @@
+#ifndef APP_SIGNAL_H
+#define APP_SIGNAL_H
 #include <semaphore.h>
 #include <stddef.h>
 #include <fcntl.h>
@@ -22,4 +24,4 @@ int sig_received;
 
 void sig_viewer_handler(int signum);
 void sig_handle_viewer();
-
+#endif
