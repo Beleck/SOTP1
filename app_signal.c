@@ -4,12 +4,13 @@
 #include "include/app_signal.h"
 
 int viewer_signal_received = 0;
+int slave_sig_received = 0;
 char *view_mmap = NULL;
 
-void sig_viewer_handler(int signum) {
+void sig_slave_handler(int signum) {
     (void) signum;
 
-	sig_received = 1;
+	slave_sig_received++;
 }
 
 void sig_handle_viewer() {

@@ -3,7 +3,7 @@ CFLAGS=-g -Wall -Wextra -std=c99
 LDFLAGS=-pthread -lrt
 IDIR=include
 DEPS=$(wildcard $(IDIR)/*.h)
-OBJ=app_shm.o app_signal.o
+OBJ=app_shm.o app_signal.o app_file.o
 TARGET=application slave viewer
 
 all: $(TARGET)

@@ -20,8 +20,8 @@ int viewer_signal_received;
 int viewer_shm_fd;
 char *view_mmap;
 sem_t *view_sem;
-int sig_received;
+int slave_sig_received;
 
-void sig_viewer_handler(int signum);
+void sig_slave_handler(int signum);
 void sig_handle_viewer();
 #endif

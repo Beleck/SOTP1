@@ -13,6 +13,7 @@
 #include <semaphore.h>
 #include "include/application.h"
 #include "include/app_signal.h"
+#include "include/app_file.h"
 
 int main (int argc, char * argv[]){
     if (argc == 1) {
@@ -24,7 +25,7 @@ int main (int argc, char * argv[]){
     printf("%d\n", getpid());
 
 // Signal initialisation
-    NEW_SIGNAL(SIGUSR1, application_action, sig_viewer_handler, SA_RESTART);
+    NEW_SIGNAL(SIGUSR1, application_action, sig_slave_handler, SA_RESTART);
     NEW_SIGNAL(SIGUSR2, viewer_action, sig_handle_viewer, SA_RESTART);
 
 // Wait for viewer to connect
@@ -77,9 +78,17 @@ int main (int argc, char * argv[]){
 
 // Sending files to slaves
 	while (num_files > 0) {
-	    pause();
-	    dprintf(master_slave[1], "%s\n", argv[argc - num_files]);
-	    num_files--;
+        if (!slave_sig_received) {
+	        pause();
+        } else {
+            // Preventing from for loop bound modification by SIGUSR1
+            int temp = slave_sig_received;
+            for (int i = 0; i < temp; i++) {
+	            dprintf(master_slave[1], "%s\n", argv[argc - num_files]);
+	            num_files--;
+                slave_sig_received--;
+            }
+        }
 	}
 
 // Get md5 from slaves and fill buffer
@@ -97,10 +106,14 @@ int main (int argc, char * argv[]){
         }
         buffer[index_shm] = '-';
         index_shm++;
-        sem_post(view_sem);
+        if (viewer_signal_received) {
+            sem_post(view_sem);
+        }
     }
     // End of the buffer
     buffer[index_shm] = 43;
+
+    write_to_file(buffer, "results.res", index_shm);
 
 // Ending of the entire program
     close(master_slave[0]);
