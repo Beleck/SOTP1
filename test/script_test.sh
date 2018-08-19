@@ -8,4 +8,4 @@ done
 cd ..
 ./application test/dir_test/*
 #md5sum test/dir_test/*
-rm -r test/dir_test
+#rm -r test/dir_test

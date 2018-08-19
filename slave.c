@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,6 +12,9 @@
 #include "include/slave.h"
 
 int main(int argc, char * argv[]){
+    (void) argc;
+    (void) argv;
+
     int ppid = getppid();
     size_t size;
     char *line = NULL;
@@ -28,9 +32,7 @@ void md5_file(char *file) {
     int pid = fork();
     if (pid) {
         waitpid(pid, NULL, 0);
-      //  close(6); //closes pipe slave_master
     } else {
-        // For now, output of md5sum is stdout, but need to be connected to viewer
          execl("/usr/bin/md5sum", "md5sum", file, NULL);
     }
 }
