@@ -11,29 +11,8 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <semaphore.h>
-#include "include/app_shm.h"
 #include "include/application.h"
-
-static int viewer_signal_received = 0;
-static int viewer_shm_fd;
-static char *view_mmap = NULL;
-static sem_t *view_sem;
-static int sig_received;
-
-void sig_viewer_handler(int signum){
-    (void) signum;
-
-	sig_received = 1;
-}
-
-void sig_handle_viewer(){
-    viewer_signal_received = 1;
-
-    viewer_shm_fd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
-    posix_fallocate(viewer_shm_fd, 0, BASE_SIZE);
-    view_mmap = newshmmap(BASE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, viewer_shm_fd, 0);
-    view_sem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
-}
+#include "include/app_signal.h"
 
 int main (int argc, char * argv[]){
     if (argc == 1) {
@@ -41,21 +20,14 @@ int main (int argc, char * argv[]){
         exit(EXIT_FAILURE);
     }
     
+// Print pid for viewer
     printf("%d\n", getpid());
 
 // Signal initialisation
-    struct sigaction application_action;
-	application_action.sa_handler = sig_viewer_handler;
-	sigemptyset(&application_action.sa_mask);
-	application_action.sa_flags = SA_RESTART;
-	sigaction(SIGUSR1, &application_action, NULL);
-    
-    struct sigaction viewer_action;
-	viewer_action.sa_handler = sig_handle_viewer;
-	sigemptyset(&viewer_action.sa_mask);
-	viewer_action.sa_flags = SA_RESTART;
-	sigaction(SIGUSR2, &viewer_action, NULL);
+    NEW_SIGNAL(SIGUSR1, application_action, sig_viewer_handler, SA_RESTART);
+    NEW_SIGNAL(SIGUSR2, viewer_action, sig_handle_viewer, SA_RESTART);
 
+// Wait for viewer to connect
     sleep(5);
     char *buffer;
     if (viewer_signal_received) {
@@ -72,10 +44,11 @@ int main (int argc, char * argv[]){
 
 // Variable initialisation
 
-	//We will decrent num_files
+	//Current number of files to send to slave
     int num_files = argc - 1;
 	//keeps the total saved
 	int total = num_files;
+    // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
     int num_init = num_files/(NUM_WORKERS*4) + 1;

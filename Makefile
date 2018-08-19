@@ -3,14 +3,18 @@ CFLAGS=-g -Wall -Wextra -std=c99
 LDFLAGS=-pthread -lrt
 IDIR=include
 DEPS=$(wildcard $(IDIR)/*.h)
-OBJ=app_shm.o
+OBJ=app_shm.o app_signal.o
 TARGET=application slave viewer
 
 all: $(TARGET)
 	rm *.o
 
 application: application.o $(OBJ)
+	$(CC) -o $@ $(LDFLAGS) $^ 
+
 viewer: viewer.o $(OBJ)
+	$(CC) -o $@ $(LDFLAGS) $^ 
+
 slave: slave.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
 
@@ -19,5 +23,4 @@ slave: slave.o $(OBJ)
 
 .PHONY = clean
 clean:
-	rm -f $(TARGET) 
-
+	rm -f $(TARGET) *.o
