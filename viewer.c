@@ -11,7 +11,6 @@
 #include <sys/mman.h>
 #include <string.h>
 #include "include/app_shm.h"
-#include "CuTest.h"
 
 int get_app_pid(int argc, char **argv);
 
@@ -28,7 +27,6 @@ void checkForTests(int argc, char **argv);
 
 int main(int argc, char **argv){
 
-	//checkForTests(argc, argv);
 	int app_pid = get_app_pid(argc, argv);
 
 	// Signal the application process that the view has begun.
@@ -124,11 +122,3 @@ void print_hash(int length, char *filehash){
 	filehash[length] = 0;
 	printf("%s\n", filehash);
 }
-
-//void checkForTests(int argc, char** argv){
-//	printf("%s\n", argv[1]);
-//	if(argc == 2 && strcmp(argv[1], "--test") == 0){
-//		RunAllTests();
-//		exit(0);
-//	}
-//}
