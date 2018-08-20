@@ -15,9 +15,14 @@ int main(int argc, char * argv[]) {
     (void) argc;
     (void) argv;
 
+    for (int i = 1; i < argc; i++) {
+        md5_file(argv[i]);
+    }
+
     int ppid = getppid();
     size_t size;
     char *line = NULL;
+    kill(ppid, SIGUSR1);
     int num_char = getline(&line, &size, stdin);
     while (num_char != -1) {
         line[num_char - 1] = '\0';

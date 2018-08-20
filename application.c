@@ -63,13 +63,15 @@ int main (int argc, char * argv[]){
     
             close(master_slave[0]);
             close(slave_master[1]);
-    
-            execl(SLAVE_DIR, "slave", NULL);
-        } else if (child_pid[i] > 0){ // Parent process
+            char *temp[num_init + 2];
+            temp[0] = "slave";
             for (int j = 0; j < num_init; j++) {
-                dprintf(master_slave[1], "%s\n", argv[i*num_init + j + 1]);
-                num_files--;
+                temp[j + 1] = argv[i*num_init + j + 1];
             }
+            temp[num_init + 1] = NULL;    
+            execv(SLAVE_DIR, temp);
+        } else if (child_pid[i] > 0){ // Parent process
+            num_files -= num_init;
         } else { // Error
             fprintf(stderr,"Error creating child: %s\n",strerror(errno));
             exit(-1);
@@ -107,8 +109,6 @@ int main (int argc, char * argv[]){
     }
     // End of the buffer
     buffer[index_shm] = 43;
-    fclose(reader);
-    free(line);
     write_to_file(buffer, "results.res", index_shm);
 
 // Ending of the entire program
@@ -128,6 +128,8 @@ int main (int argc, char * argv[]){
     } else {
         free(buffer);
     }
+    fclose(reader);
+    free(line);
 
     return 0;
 }
