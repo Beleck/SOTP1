@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include "include/slave.h"
+#include "slave.h"
 
 int main(int argc, char * argv[]) {
     (void) argc;

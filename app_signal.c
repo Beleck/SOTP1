@@ -1,7 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include <fcntl.h>
 #include <sys/mman.h>
-#include "include/app_signal.h"
+#include "app_signal.h"
 
 int viewer_signal_received = 0;
 int slave_sig_received = 0;

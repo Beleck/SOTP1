@@ -11,9 +11,9 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <semaphore.h>
-#include "include/application.h"
-#include "include/app_signal.h"
-#include "include/app_file.h"
+#include "application.h"
+#include "app_signal.h"
+#include "tools.h"
 
 int main (int argc, char * argv[]){
     if (argc == 1) {

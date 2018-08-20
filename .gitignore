@@ -2,7 +2,7 @@
 *.pdf
 
 # out
-*.o
+obj/*.o
 
 # application
 application

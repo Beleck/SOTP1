@@ -1,26 +1,26 @@
 CC=gcc
-CFLAGS=-g -Wall -Wextra -std=c99
+CFLAGS=-g -Wall -Wextra -std=c99 -Iinclude
 LDFLAGS=-pthread -lrt
 IDIR=include
 DEPS=$(wildcard $(IDIR)/*.h)
-OBJ=app_shm.o app_signal.o app_file.o
+OBJDIR=obj
+OBJ=$(OBJDIR)/app_shm.o $(OBJDIR)/app_signal.o $(OBJDIR)/tools.o
 TARGET=application slave viewer
 
 all: $(TARGET)
-	rm *.o
 
-application: application.o $(OBJ)
+application: $(OBJDIR)/application.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
 
-viewer: viewer.o $(OBJ)
+viewer: $(OBJDIR)/viewer.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
 
-slave: slave.o $(OBJ)
+slave: $(OBJDIR)/slave.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
 
-%.o: %.c $(DEPS) 
+$(OBJDIR)/%.o: %.c $(DEPS) 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-.PHONY = clean
+.PHONY: clean
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) $(OBJDIR)/*

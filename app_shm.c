@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <semaphore.h>
-#include "include/app_shm.h"
+#include "app_shm.h"
 
 int newshm(char *name, int oflags, int mode){
 	int fd = shm_open(name, oflags, mode);

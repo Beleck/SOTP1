@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <string.h>
-#include "include/app_shm.h"
+#include "app_shm.h"
 
 int get_app_pid(int argc, char **argv);
 
@@ -66,7 +66,6 @@ int get_app_pid(int argc, char** argv){
 	} else {
 		do{
 			scanf("%d", &app_pid);
-            printf("app_pid : %d\n", app_pid);
 		}
 		while (app_pid <= 1);
 	}
