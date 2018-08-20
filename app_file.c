@@ -1,6 +1,13 @@
 #include <stdio.h>
 
 void write_to_file(char *buffer, const char *name, int length) {
+    int i = 0;
+    while (buffer[i] != '\0') {
+        if (buffer[i] == '-') {
+            buffer[i] = '\n';
+        }
+        i++;
+    }
     FILE *file = fopen(name, "w+");
     fwrite((void *) buffer, 1, length, file);
     fclose(file);
