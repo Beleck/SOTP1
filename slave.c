@@ -25,6 +25,7 @@ int main(int argc, char * argv[]) {
         kill(ppid, SIGUSR1);
         num_char = getline(&line, &size, stdin);
     }
+    free(line);
     return 0;
 }
 

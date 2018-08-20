@@ -26,9 +26,6 @@ void print_hash(int length, char *filehash);
 void checkForTests(int argc, char **argv);
 
 
-
-
-
 int main(int argc, char **argv){
 
 	//checkForTests(argc, argv);
@@ -71,8 +68,9 @@ int get_app_pid(int argc, char** argv){
 	} else {
 		do{
 			scanf("%d", &app_pid);
+            printf("app_pid : %d\n", app_pid);
 		}
-		while (app_pid <= 1 || app_pid >= (int) getpid());
+		while (app_pid <= 1);
 	}
 	return app_pid;
 }
@@ -110,6 +108,7 @@ int read_hash(char *hashes, int start_next_hash){
 		filehash[length_cur_hash] = hashes[i];
 	}
 	print_hash(length_cur_hash, filehash);
+    free(filehash);
 	return length_cur_hash;
 }
 

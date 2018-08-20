@@ -29,7 +29,12 @@ int main (int argc, char * argv[]){
     NEW_SIGNAL(SIGUSR2, viewer_action, sig_handle_viewer, SA_RESTART);
 
 // Wait for viewer to connect
+    //if (!isatty(STDOUT_FILENO)) {
+    //    pause();
+    //    //sleep(10);
+    //} else {
     sleep(5);
+    //}
     char *buffer;
     if (viewer_signal_received) {
         buffer = view_mmap;        
@@ -120,7 +125,8 @@ int main (int argc, char * argv[]){
     }
     // End of the buffer
     buffer[index_shm] = 43;
-
+    fclose(reader);
+    free(line);
     write_to_file(buffer, "results.res", index_shm);
 
 // Ending of the entire program
@@ -132,7 +138,14 @@ int main (int argc, char * argv[]){
     for (int i = 0; i < NUM_WORKERS; i++) {
         waitpid(child_pid[i], NULL, 0);
     }
-    munmap(view_mmap, BASE_SIZE);
-    shm_unlink(APP_SHM);
+    if (viewer_signal_received) {
+        munmap(view_mmap, BASE_SIZE);
+        shm_unlink(APP_SHM);
+        sem_close(view_sem);
+        sem_unlink(APP_SEM);
+    } else {
+        free(buffer);
+    }
+
     return 0;
 }
