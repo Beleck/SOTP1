@@ -29,12 +29,7 @@ int main (int argc, char * argv[]){
     NEW_SIGNAL(SIGUSR2, viewer_action, sig_handle_viewer, SA_RESTART);
 
 // Wait for viewer to connect
-    //if (!isatty(STDOUT_FILENO)) {
-    //    pause();
-    //    //sleep(10);
-    //} else {
     sleep(5);
-    //}
     char *buffer;
     if (viewer_signal_received) {
         buffer = view_mmap;        
@@ -105,20 +100,7 @@ int main (int argc, char * argv[]){
 	reader = fdopen(slave_master[0], "r");
     for (int nb_files = 0; nb_files < argc - 1; nb_files++) {
 	    num_char = getline(&line, &size, reader);
-        for (int i = 33; i < num_char - 1; i++) {
-            buffer[index_shm] = line[i];
-            index_shm++;            
-        }
-        buffer[index_shm] = ':';
-        index_shm++;
-        buffer[index_shm] = ' ';
-        index_shm++;
-        for (int i = 0; i < 33; i++) {
-            buffer[index_shm] = line[i];
-            index_shm++;
-        }
-        buffer[index_shm] = '-';
-        index_shm++;
+        index_shm = write_to_buffer(buffer, line, index_shm, num_char);
         if (viewer_signal_received) {
             sem_post(view_sem);
         }
