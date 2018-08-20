@@ -23,6 +23,7 @@ int main (int argc, char * argv[]){
     
 // Print pid for viewer
     printf("%d\n", getpid());
+    fflush(stdout);
 
 // Signal initialisation
     NEW_SIGNAL(SIGUSR1, application_action, sig_slave_handler, SA_RESTART);
