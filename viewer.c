@@ -97,7 +97,7 @@ int read_hash(char *hashes, int start_next_hash){
 	char *filehash = NULL;
 	int length_cur_hash = 0;
 	// A dash will be used to signal the end of one hash and the start of the next.
-	for (int i = start_next_hash; hashes[i] != '-' && hashes[i] != '\0'; i++, length_cur_hash++) {
+	for (int i = start_next_hash; hashes[i] != '\n' && hashes[i] != '\0'; i++, length_cur_hash++) {
 		if (length_cur_hash % BASE_LEN == 0) {
             filehash = realloc(filehash, length_cur_hash + BASE_LEN);
 			if (filehash == NULL) {
