@@ -75,7 +75,7 @@ int main (int argc, char * argv[]){
             num_files -= num_init;
         } else { // Error
             fprintf(stderr,"Error creating child: %s\n",strerror(errno));
-            exit(-1);
+            exit(EXIT_FAILURE);
         }
     }
 

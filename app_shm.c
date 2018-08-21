@@ -14,7 +14,7 @@ int newshm(char *name, int oflags, int mode){
 	if (fd == -1) {
 		printf("Error retrieving shared memoy, terminating\n");
 		printf("%s\n", strerror(errno));
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	return fd;
 }
@@ -25,7 +25,7 @@ void *newshmmap(size_t length, int prot, int flags, int fd, off_t offset){
 	if (map == (void*) -1) {
 		printf("Error mapping memory, terminating\n");
 		printf("%s\n", strerror(errno));
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	return map;
 }
@@ -35,7 +35,7 @@ sem_t *newsem(const char *name, int oflag, mode_t mode, unsigned int value){
 	if (sem == SEM_FAILED) {
 		printf("Error creating semaphore, terminating\n");
 		printf("%s\n", strerror(errno));
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	return sem;
 }

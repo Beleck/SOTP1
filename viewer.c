@@ -33,7 +33,7 @@ int main(int argc, char **argv){
 	if (kill(app_pid, SIGUSR2) == -1) {
 		printf("error signalling the application process, terminating\n");
 		printf("%s\n", strerror(errno));
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	int app_shm_fd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
@@ -61,7 +61,7 @@ int get_app_pid(int argc, char** argv){
 		//hasn't been run yet so there will be nobody to signal
 		if (app_pid <= 1 || app_pid >= (int) getpid()) {
 			printf("invalid process id, process ending\n");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	} else {
 		do{
@@ -99,7 +99,7 @@ int read_hash(char *hashes, int start_next_hash){
             filehash = realloc(filehash, length_cur_hash + BASE_LEN);
 			if (filehash == NULL) {
 				printf("error allocating memory, terminating\n");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 		}
 		filehash[length_cur_hash] = hashes[i];
@@ -115,7 +115,7 @@ void print_hash(int length, char *filehash){
         filehash = realloc(filehash, length + 1);
 		if (filehash == NULL) {
 			printf("error allocating memory, terminating\n");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 	filehash[length] = 0;
