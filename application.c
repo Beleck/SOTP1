@@ -46,13 +46,13 @@ int main (int argc, char * argv[]){
 
 // Variable initialisation
 	//Current number of files to send to slave
-    int num_files = argc - 1;
+    int calculed_files = argc - 1;
     // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
-    int num_init = num_files/(NUM_WORKERS*4) + 1;
+    int num_init = calculed_files/(NUM_WORKERS*4) + 1;
 
-// Childs creation and sending them first files
+// Children creation and sending them first files
     for (int i = 0; i < NUM_WORKERS; i++) {
         child_pid[i] = fork();
         if (!child_pid[i]) { // Child process
@@ -72,42 +72,48 @@ int main (int argc, char * argv[]){
             temp[num_init + 1] = NULL;    
             execv(SLAVE_DIR, temp);
         } else if (child_pid[i] > 0){ // Parent process
-            num_files -= num_init;
+            calculed_files -= num_init;
         } else { // Error
             fprintf(stderr,"Error creating child: %s\n",strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
 
+	FILE *reader = fdopen(slave_master[0], "r");
+	char *line = NULL;
+	size_t size;
+	int num_char;
+    int index_shm = 0;
+    int printed_files = 0; 
 // Sending files to slaves
-	while (num_files > 0) {
+	while (calculed_files > 0) {
         if (!slave_sig_received) {
 	        pause();
         } else {
             // Preventing from for loop bound modification by SIGUSR1
             int temp = slave_sig_received;
             for (int i = 0; i < temp; i++) {
-	            dprintf(master_slave[1], "%s\n", argv[argc - num_files]);
-	            num_files--;
-                slave_sig_received--;
+	            dprintf(master_slave[1], "%s\n", argv[argc - calculed_files]);
+	            calculed_files--;
+	            num_char = getline(&line, &size, reader);
+                index_shm = write_to_buffer(buffer, line, index_shm, num_char);
+                printed_files++;
+                if (viewer_signal_received) {
+                    sem_post(view_sem);
+                }
             }
+            slave_sig_received -= temp;
         }
 	}
-
-// Get md5 from slaves and fill buffer
-	FILE *reader;
-	char *line = NULL;
-	size_t size;
-	int num_char;
-    int index_shm = 0;
-	reader = fdopen(slave_master[0], "r");
-    for (int nb_files = 0; nb_files < argc - 1; nb_files++) {
+    for (int i = printed_files; i < argc - 1; i++) {
 	    num_char = getline(&line, &size, reader);
         index_shm = write_to_buffer(buffer, line, index_shm, num_char);
         if (viewer_signal_received) {
             sem_post(view_sem);
         }
     }
+        
+// Get md5 from slaves and fill buffer
     // End of the buffer
     buffer[index_shm] = 43;
     write_to_file(buffer, "results.res", index_shm);
