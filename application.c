@@ -23,7 +23,7 @@ int main (int argc, char * argv[]){
 
     int num_workers = 2; //default
     char custom_filename[FILENAME_SIZE] = "results.res";
-    int has_flags = check_flags(custom_filename, &num_workers,argc, argv);
+    int has_flags = check_flags(custom_filename, &num_workers, argc, argv);
 
 
 // Print pid for viewer
@@ -57,7 +57,7 @@ int main (int argc, char * argv[]){
     // Array of slave pid
     int child_pid[num_workers];
     // number of files to send first to slaves
-    int num_init = calc_init(nb_files, NUM_WORKERS);
+    int num_init = calc_init(nb_files, num_workers);
 
 // Children creation and sending them first files
     for (int i = 0; i < num_workers; i++) {
@@ -132,7 +132,7 @@ int main (int argc, char * argv[]){
     close(slave_master[0]);
     close(slave_master[1]);
 
-    for (int i = 0; i < NUM_WORKERS; i++) {
+    for (int i = 0; i < num_workers; i++) {
         waitpid(child_pid[i], NULL, 0);
     }
     if (viewer_signal_received) {

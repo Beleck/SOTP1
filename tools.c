@@ -25,17 +25,17 @@ int write_to_buffer(char *buffer, char *line, int index_shm, int num_char) {
     return index_shm;
 }
 
-int check_flags(char *option, int* num_workers, int argc, char *argv[]) {
+int check_flags(char *option, int *num_workers, int argc, char *argv[]) {
     int flag = 0;
-    int flag_acum=0;
+    int flag_acum = 0;
     for (int i = 0; i < argc; i++) {
         if (flag == 1) {
             strcpy(option, argv[i]);
             strcat(option, ".res");
             flag_acum++;
             flag = 0;
-        }else{
-            if (flag == 2){
+        } else {
+            if (flag == 2) {
                 *num_workers = *argv[i] - '0';
                 flag = 0;
                 flag_acum++;
@@ -43,8 +43,8 @@ int check_flags(char *option, int* num_workers, int argc, char *argv[]) {
         }
         if (*(argv[i]) == '-' && *(argv[i]+1) == 'f') {
             flag = 1;
-        }else{
-            if(*(argv[i]) == '-' && *(argv[i]+1) == 'w'){
+        } else {
+            if(*(argv[i]) == '-' && *(argv[i]+1) == 'w') {
                 flag = 2;
             }
         }
