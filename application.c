@@ -54,7 +54,7 @@ int main (int argc, char * argv[]){
     int calculed_files = nb_files;
     // Array of slave pid
     int child_pid[NUM_WORKERS];
-    // Arbitrary value
+    // number of files to send first to slaves
     int num_init = calc_init(nb_files, NUM_WORKERS);
 
 // Children creation and sending them first files
