@@ -21,8 +21,11 @@ int main (int argc, char * argv[]){
         exit(EXIT_FAILURE);
     }
 
+    int num_workers = 2; //default
     char custom_filename[FILENAME_SIZE] = "results.res";
-    int has_flags = check_flags(custom_filename, argc, argv);
+    int has_flags = check_flags(custom_filename, &num_workers,argc, argv);
+
+    printf("NUMBER OF WORKERS: %d\n", num_workers);
 
 // Print pid for viewer
     printf("%d\n", getpid());
@@ -53,12 +56,12 @@ int main (int argc, char * argv[]){
 	//Current number of files to send to slave
     int calculed_files = nb_files;
     // Array of slave pid
-    int child_pid[NUM_WORKERS];
+    int child_pid[num_workers];
     // Arbitrary value
-    int num_init = calculed_files/(NUM_WORKERS*4) + 1;
+    int num_init = calculed_files/(num_workers*4) + 1;
 
 // Children creation and sending them first files
-    for (int i = 0; i < NUM_WORKERS; i++) {
+    for (int i = 0; i < num_workers; i++) {
         child_pid[i] = fork();
         if (!child_pid[i]) { // Child process
             close(master_slave[1]);
