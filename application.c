@@ -119,7 +119,6 @@ int main (int argc, char * argv[]){
 // Get md5 from slaves and fill buffer
     // End of the buffer
     buffer[index_shm] = 43;
-    fprintf(stderr, "%s\n", custom_filename);
     if (has_flags){
         strcat(custom_filename, ".res");
         write_to_file(buffer, custom_filename, index_shm);
