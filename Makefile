@@ -22,7 +22,7 @@ $(OBJDIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 .PHONY: test
-test:
+test: all
 	@cd test && bash script_test.sh
 
 .PHONY: clean
