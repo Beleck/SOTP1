@@ -31,7 +31,6 @@ int check_flags(char *option, int *num_workers, int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) {
         if (flag == 1) {
             strcpy(option, argv[i]);
-            strcat(option, ".res");
             flag_acum++;
             flag = 0;
         } else {

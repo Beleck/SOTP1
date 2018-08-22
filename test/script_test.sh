@@ -6,7 +6,7 @@ export NUM_FILES=170
 mkdir -p dir_test
 for i in $(seq 0 $NUM_FILES); do 
     touch dir_test/$i
-    dd if=/dev/urandom bs=1024 of=dir_test/$i count=1 2> /dev/null
+    dd if=/dev/urandom bs=1024 of=dir_test/$i count=10 2> /dev/null
 done
 
 cd ..
