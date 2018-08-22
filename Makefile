@@ -24,7 +24,7 @@ $(OBJDIR)/%.o: %.c $(DEPS)
 
 .PHONY: test
 test: all
-	@cd test && bash script_test.sh
+	@cd test && ./script_test.sh
 
 .PHONY: clean
 clean:
