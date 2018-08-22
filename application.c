@@ -21,7 +21,7 @@ int main (int argc, char * argv[]){
         exit(EXIT_FAILURE);
     }
 
-    char custom_filename[FILENAME_SIZE];
+    char custom_filename[FILENAME_SIZE] = "results.res";
     int has_flags = check_flags(custom_filename, argc, argv);
 
 // Print pid for viewer
@@ -48,8 +48,10 @@ int main (int argc, char * argv[]){
     pipe(slave_master);
 
 // Variable initialisation
+    int nb_flags = 2 * has_flags;
+    int nb_files = argc - 1 - nb_flags;
 	//Current number of files to send to slave
-    int calculed_files = argc - 1 - 2*has_flags;
+    int calculed_files = nb_files;
     // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
@@ -70,11 +72,11 @@ int main (int argc, char * argv[]){
             char *temp[num_init + 2];
             temp[0] = "slave";
             for (int j = 0; j < num_init; j++) {
-                temp[j + 1] = argv[i*num_init + j + 1 + 2*has_flags];
+                temp[j + 1] = argv[i*num_init + j + 1 + nb_flags];
             }
             temp[num_init + 1] = NULL;
             execv(SLAVE_DIR, temp);
-        } else if (child_pid[i] > 0){ // Parent process
+        } else if (child_pid[i] > 0) { // Parent process
             calculed_files -= num_init;
         } else { // Error
             fprintf(stderr,"Error creating child: %s\n",strerror(errno));
@@ -108,7 +110,7 @@ int main (int argc, char * argv[]){
             slave_sig_received -= temp;
         }
 	}
-    for (int i = printed_files; i < argc - 1 - 2*has_flags; i++) {
+    for (int i = printed_files; i < nb_files; i++) {
 	    num_char = getline(&line, &size, reader);
         index_shm = write_to_buffer(buffer, line, index_shm, num_char);
         if (viewer_signal_received) {
@@ -119,12 +121,7 @@ int main (int argc, char * argv[]){
 // Get md5 from slaves and fill buffer
     // End of the buffer
     buffer[index_shm] = 43;
-    if (has_flags){
-        strcat(custom_filename, ".res");
-        write_to_file(buffer, custom_filename, index_shm);
-    }else{
-        write_to_file(buffer, "results.res", index_shm);
-    }
+    write_to_file(buffer, custom_filename, index_shm);
 
 
 // Ending of the entire program

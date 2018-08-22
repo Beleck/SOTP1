@@ -25,18 +25,16 @@ int write_to_buffer(char *buffer, char *line, int index_shm, int num_char) {
     return index_shm;
 }
 
-int check_flags(char * option, int argc, char * argv[]){
+int check_flags(char *option, int argc, char *argv[]) {
     int flag = 0;
-    for (int i = 0; i< argc; i++){
-        if (flag){
+    for (int i = 0; i < argc; i++) {
+        if (flag) {
             strcpy(option, argv[i]);
             return 1;
-
         }
-        if (*(argv[i]) == '-' && *(argv[i]+1) == 'f'){
+        if (*(argv[i]) == '-' && *(argv[i]+1) == 'f') {
             flag = 1;
         }
     }
-
     return 0;
 }
