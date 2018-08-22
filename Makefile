@@ -8,6 +8,7 @@ OBJ=$(OBJDIR)/app_shm.o $(OBJDIR)/app_signal.o $(OBJDIR)/tools.o
 TARGET=application slave viewer
 
 all: $(TARGET)
+	mkdir -p obj
 
 application: $(OBJDIR)/application.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
