@@ -10,10 +10,16 @@ for i in $(seq 0 $NUM_FILES); do
 done
 
 cd ..
-
-for script in $(ls test/test*); do
-    "$script"
+NB_SCRIPT=$(ls test/test* | wc -w)
+for i in $(seq 1 $NB_SCRIPT); do
+    test/test"$i".sh
+    if [ $? = 0 ]; then
+        echo "***************** TEST $i PASSED ***************"
+    else 
+        echo "///////////////// TEST $i FAILED \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+    fi
 done
+
 
 
 rm -r test/dir_test

@@ -19,7 +19,7 @@ slave: $(OBJDIR)/slave.o $(OBJ)
 	$(CC) -o $@ $(LDFLAGS) $^ 
 
 $(OBJDIR)/%.o: %.c $(DEPS) 
-	mkdir -p obj
+	@mkdir -p $(@D)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 .PHONY: test
