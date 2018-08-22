@@ -25,7 +25,6 @@ int main (int argc, char * argv[]){
     char custom_filename[FILENAME_SIZE] = "results.res";
     int has_flags = check_flags(custom_filename, &num_workers,argc, argv);
 
-    printf("NUMBER OF WORKERS: %d\n", num_workers);
 
 // Print pid for viewer
     printf("%d\n", getpid());
@@ -57,8 +56,8 @@ int main (int argc, char * argv[]){
     int calculed_files = nb_files;
     // Array of slave pid
     int child_pid[num_workers];
-    // Arbitrary value
-    int num_init = calculed_files/(num_workers*4) + 1;
+    // number of files to send first to slaves
+    int num_init = calc_init(nb_files, NUM_WORKERS);
 
 // Children creation and sending them first files
     for (int i = 0; i < num_workers; i++) {
