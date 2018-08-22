@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 #include "app_shm.h"
 
-#define BASE_SIZE 1000
 #define NEW_SIGNAL(signal, name, handler, flags) \
     do {                                         \
         struct sigaction name;                   \

@@ -2,7 +2,7 @@
 #define APP_SHM_H
 #define APP_SHM "/appShm"
 #define APP_SEM "/appSem"
-#define DFLT_SIZE 1000
+#define BASE_SIZE 10000
 #include <semaphore.h>
 
 // Defines wrapper functions for error checks

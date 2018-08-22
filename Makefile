@@ -21,6 +21,10 @@ slave: $(OBJDIR)/slave.o $(OBJ)
 $(OBJDIR)/%.o: %.c $(DEPS) 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+.PHONY: test
+test:
+	@cd test && bash script_test.sh
+
 .PHONY: clean
 clean:
 	rm -f $(TARGET) $(OBJDIR)/*

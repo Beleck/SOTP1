@@ -38,7 +38,7 @@ int main(int argc, char **argv){
 
 	int app_shm_fd = newshm(APP_SHM, O_RDWR | O_CREAT, S_IRWXU);
 	// Memory allocation is left to the applicaction process
-	char *hashes = newshmmap(DFLT_SIZE, PROT_READ, MAP_SHARED, app_shm_fd, 0);
+	char *hashes = newshmmap(BASE_SIZE * sizeof(char), PROT_READ, MAP_SHARED, app_shm_fd, 0);
 	sem_t *app_sem = newsem(APP_SEM, O_CREAT, S_IRWXU, 0);
 
 	print_hashes(hashes, app_sem);
