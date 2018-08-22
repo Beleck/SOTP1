@@ -20,7 +20,7 @@ int main(int argc, char * argv[]) {
     }
 
     int ppid = getppid();
-    size_t size;
+    size_t size = 0;
     char *line = NULL;
     kill(ppid, SIGUSR1);
     int num_char = getline(&line, &size, stdin);

@@ -25,7 +25,6 @@ int main (int argc, char * argv[]){
     char custom_filename[FILENAME_SIZE] = "results.res";
     int has_flags = check_flags(custom_filename, &num_workers, argc, argv);
 
-
 // Print pid for viewer
     printf("%d\n", getpid());
     fflush(stdout);
@@ -88,7 +87,7 @@ int main (int argc, char * argv[]){
 
 	FILE *reader = fdopen(slave_master[0], "r");
 	char *line = NULL;
-	size_t size;
+	size_t size = 0;
 	int num_char;
     int index_shm = 0;
     int printed_files = 0;
