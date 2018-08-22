@@ -20,7 +20,10 @@ int main (int argc, char * argv[]){
         fprintf(stderr, "Need at least one file\n");
         exit(EXIT_FAILURE);
     }
-    
+
+    char custom_filename[FILENAME_SIZE];
+    int has_flags = check_flags(custom_filename, argc, argv);
+
 // Print pid for viewer
     printf("%d\n", getpid());
     fflush(stdout);
@@ -33,7 +36,7 @@ int main (int argc, char * argv[]){
     sleep(5);
     char *buffer;
     if (viewer_signal_received) {
-        buffer = view_mmap;        
+        buffer = view_mmap;
     } else {
         buffer = malloc(sizeof(char) * BASE_SIZE);
     }
@@ -46,7 +49,7 @@ int main (int argc, char * argv[]){
 
 // Variable initialisation
 	//Current number of files to send to slave
-    int calculed_files = argc - 1;
+    int calculed_files = argc - 1 - 2*has_flags;
     // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
@@ -58,18 +61,18 @@ int main (int argc, char * argv[]){
         if (!child_pid[i]) { // Child process
             close(master_slave[1]);
             close(slave_master[0]);
-    
+
             dup2(master_slave[0], STDIN_FILENO);
             dup2(slave_master[1], STDOUT_FILENO);
-    
+
             close(master_slave[0]);
             close(slave_master[1]);
             char *temp[num_init + 2];
             temp[0] = "slave";
             for (int j = 0; j < num_init; j++) {
-                temp[j + 1] = argv[i*num_init + j + 1];
+                temp[j + 1] = argv[i*num_init + j + 1 + 2*has_flags];
             }
-            temp[num_init + 1] = NULL;    
+            temp[num_init + 1] = NULL;
             execv(SLAVE_DIR, temp);
         } else if (child_pid[i] > 0){ // Parent process
             calculed_files -= num_init;
@@ -84,7 +87,7 @@ int main (int argc, char * argv[]){
 	size_t size;
 	int num_char;
     int index_shm = 0;
-    int printed_files = 0; 
+    int printed_files = 0;
 // Sending files to slaves
 	while (calculed_files > 0) {
         if (!slave_sig_received) {
@@ -105,18 +108,25 @@ int main (int argc, char * argv[]){
             slave_sig_received -= temp;
         }
 	}
-    for (int i = printed_files; i < argc - 1; i++) {
+    for (int i = printed_files; i < argc - 1 - 2*has_flags; i++) {
 	    num_char = getline(&line, &size, reader);
         index_shm = write_to_buffer(buffer, line, index_shm, num_char);
         if (viewer_signal_received) {
             sem_post(view_sem);
         }
     }
-        
+
 // Get md5 from slaves and fill buffer
     // End of the buffer
     buffer[index_shm] = 43;
-    write_to_file(buffer, "results.res", index_shm);
+    fprintf(stderr, "%s\n", custom_filename);
+    if (has_flags){
+        strcat(custom_filename, ".res");
+        write_to_file(buffer, custom_filename, index_shm);
+    }else{
+        write_to_file(buffer, "results.res", index_shm);
+    }
+
 
 // Ending of the entire program
     close(master_slave[0]);

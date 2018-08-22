@@ -29,11 +29,11 @@ int check_flags(char * option, int argc, char * argv[]){
     int flag = 0;
     for (int i = 0; i< argc; i++){
         if (flag){
-            strncpy(option, argv[i], strlen(argv[i]));
+            strcpy(option, argv[i]);
             return 1;
 
         }
-        if (*(argv[i]) == '-' && *(argv[i]+1) == 'm'){
+        if (*(argv[i]) == '-' && *(argv[i]+1) == 'f'){
             flag = 1;
         }
     }
