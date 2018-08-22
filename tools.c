@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void write_to_file(char *buffer, const char *name, int length) {
     FILE *file = fopen(name, "w+");
@@ -22,4 +23,20 @@ int write_to_buffer(char *buffer, char *line, int index_shm, int num_char) {
     buffer[index_shm] = '\n';
     index_shm++;
     return index_shm;
+}
+
+int check_flags(char * option, int argc, char * argv[]){
+    int flag = 0;
+    for (int i = 0; i< argc; i++){
+        if (flag){
+            strncpy(option, argv[i], strlen(argv[i]));
+            return 1;
+
+        }
+        if (*(argv[i]) == '-' && *(argv[i]+1) == 'm'){
+            flag = 1;
+        }
+    }
+
+    return 0;
 }
