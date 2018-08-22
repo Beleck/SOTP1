@@ -38,3 +38,15 @@ int check_flags(char *option, int argc, char *argv[]) {
     }
     return 0;
 }
+
+int calc_init(int nb_files, int num_workers) {
+    if (nb_files < num_workers) {
+        return 0;
+    } else if (nb_files <= num_workers*2) {
+        return 1;
+    } else if (nb_files <= num_workers*3) {
+        return nb_files/(num_workers*2);
+    } else {
+       return nb_files/(num_workers*3); 
+    }
+}

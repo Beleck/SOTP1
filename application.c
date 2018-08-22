@@ -55,7 +55,7 @@ int main (int argc, char * argv[]){
     // Array of slave pid
     int child_pid[NUM_WORKERS];
     // Arbitrary value
-    int num_init = calculed_files/(NUM_WORKERS*4) + 1;
+    int num_init = calc_init(nb_files, NUM_WORKERS);
 
 // Children creation and sending them first files
     for (int i = 0; i < NUM_WORKERS; i++) {
