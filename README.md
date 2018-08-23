@@ -11,9 +11,9 @@ or
 
 ./application [FLAGS] FILES | ./viewer
 
-###FLAGS
+### FLAGS
 
-..* -f filename
+* -f filename
         Specify the file where calculus will be wrote.
-..* -w workers
+* -w workers
         Specify number of workers to do md5 calculus
